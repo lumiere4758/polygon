@@ -12,15 +12,33 @@ const material = new THREE.MeshBasicMaterial( { map: texture } );
 const cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
 
-camera.position.z = 5;
+const donut_geo = new THREE.TorusGeometry(10, 3, 16, 100);
+const donut_tex = new THREE.MeshBasicMaterial({color: 0xffffff });
+const donut = new THREE.Mesh(donut_geo, donut_tex);
+scene.add(donut);
+
+camera.position.z = 18;
 
 function animate() {
 
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  donut.rotation.x += 0.01;
+  donut.rotation.y += 0.01;
 
   renderer.render( scene, camera );
 
 }
+
+function add_star() {
+    const star_geometry = new THREE.SphereGeometry(0.25,24,24);
+    const star_material = new THREE.MeshBasicMaterial({color: 0xffffff })
+    const star = new THREE.Mesh(star_geometry, star_material);
+
+    const [x,y,z] = Array(3)
+        .fill()
+        .map(() => THREE.MathUtils.randFloatSpread(200));
+    star.position.set(x,y,z);
+    scene.add(star)
+}
+Array(200).fill().forEach(add_star);
 
 animate();
