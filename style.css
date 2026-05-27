@@ -29,6 +29,14 @@ header {
     margin-bottom: 350px;
 }
 
+header h1 {
+    margin: 0 0 8px 0;
+}
+
+header p {
+    margin: 0;
+}
+
 section {
     grid-column: 2 / 8;
     padding: 16px;
@@ -41,3 +49,47 @@ section {
 .left {
     grid-column: 6/12;
 }
+
+
+
+
+
+#cupcake-container {
+    grid-column: 2 / 5;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 350px;
+    /* Transition setup - starts hidden, off to the left */
+    opacity: 0;
+    transform: translateX(-80px) scale(0.7);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+
+#cupcake-container.visible {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+}
+
+#cupcake-canvas {
+    width: 100%;
+    height: 300px;
+    display: block;
+}
+
+#counter {
+    grid-column: 6 / 12;
+    font-size: 40px;
+    padding: 16px;
+    background: rgba(15, 15, 15, 0.95);
+    color: white;
+    line-height: 1.5;
+    margin-top: -320px;
+    margin-bottom: 350px;
+}
+
+/* popcorn styles*/

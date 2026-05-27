@@ -1,12 +1,83 @@
 import './style.css';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+// cupcake
+(function() {
+    const canvas = document.querySelector('#cupcake-canvas');
+    const cupcakeScene = new THREE.Scene();
+    const cupcakeCamera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    cupcakeCamera.position.set(0, 1, 4);
+    cupcakeCamera.lookAt(0, 0.5, 0);
 
-const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector('#bg'),
-});
+    const cupcakeRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    cupcakeRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    cupcakeRenderer.setPixelRatio(window.devicePixelRatio);
+    cupcakeRenderer.setClearColor(0x000000, 0);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+    cupcakeScene.add(ambientLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+    dirLight.position.set(2, 3, 4);
+    cupcakeScene.add(dirLight);
+
+    let cupcakeModel = null;
+    const loader = new GLTFLoader();
+    loader.load('/model/cupcake.glb', (gltf) => {
+        cupcakeModel = gltf.scene;
+
+        // Center and scale model
+        const box = new THREE.Box3().setFromObject(cupcakeModel);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 2 / maxDim;
+        cupcakeModel.scale.setScalar(scale);
+        cupcakeModel.position.sub(center.multiplyScalar(scale));
+
+        cupcakeScene.add(cupcakeModel);
+    });
+
+    function animateCupcake() {
+        requestAnimationFrame(animateCupcake);
+        if (cupcakeModel) {
+            cupcakeModel.rotation.y += 0.01;
+        }
+        cupcakeRenderer.render(cupcakeScene, cupcakeCamera);
+    }
+    animateCupcake();
+
+    // Handle resize
+    window.addEventListener('resize', () => {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        cupcakeRenderer.setSize(w, h);
+        cupcakeCamera.aspect = w / h;
+        cupcakeCamera.updateProjectionMatrix();
+    });
+
+    
+    const cupcakeSection = document.querySelector('.cupcake-text');
+    const cupcakeContainer = document.querySelector('#cupcake-container');
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    cupcakeContainer.classList.add('visible');
+                } else {
+                    cupcakeContainer.classList.remove('visible');
+                }
+            });
+        },
+        { threshold: 0.15 }
+    );
+    observer.observe(cupcakeSection);
+})();
+
+
+
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setAnimationLoop(animate);
 
@@ -63,3 +134,22 @@ animate();
 
 document.body.onscroll = moveCamera;
 moveCamera();
+
+const startDate = new Date("September 28, 2025 23:00:00").getTime();
+function updateCounter(){
+    const now = new Date().getTime();
+    const difference = now - startDate;
+
+    // Time calculations
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((difference / (1000 * 60)) % 60);
+    const seconds = Math.floor((difference / 1000) % 60);
+
+    document.getElementById("counter").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+
+}
+
+setInterval(updateCounter, 1000);
+updateCounter();
