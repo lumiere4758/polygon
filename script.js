@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 (function() {
     const canvas = document.querySelector('#cupcake-canvas');
     const cupcakeScene = new THREE.Scene();
-    const cupcakeCamera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    const cupcakeCamera = new THREE.PerspectiveCamera(44, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
     cupcakeCamera.position.set(0, 1, 4);
     cupcakeCamera.lookAt(0, 0.5, 0);
 
@@ -76,8 +76,88 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
     observer.observe(cupcakeSection);
 })();
 
+// popcorn
+(function() {
+    const canvas = document.querySelector('#popcorn-canvas');
+    const popcornScene = new THREE.Scene();
+    const popcornCamera = new THREE.PerspectiveCamera(44, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    popcornCamera.position.set(0, 1, 4);
+    popcornCamera.lookAt(0, 0.5, 0);
+
+    const popcornRenderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    popcornRenderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    popcornRenderer.setPixelRatio(window.devicePixelRatio);
+    popcornRenderer.setClearColor(0x000000, 0);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+    popcornScene.add(ambientLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+    dirLight.position.set(2, 3, 4);
+    popcornScene.add(dirLight);
+
+    let popcornModel = null;
+    const loader = new GLTFLoader();
+    loader.load('/model/popcorn.glb', (gltf) => {
+        popcornModel = gltf.scene;
+
+        // Center and scale model
+        const box = new THREE.Box3().setFromObject(popcornModel);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 2 / maxDim;
+        popcornModel.scale.setScalar(scale);
+        popcornModel.position.sub(center.multiplyScalar(scale));
+
+        popcornScene.add(popcornModel);
+    });
+
+    function animatePopcorn() {
+        requestAnimationFrame(animatePopcorn);
+        if (popcornModel) {
+            popcornModel.rotation.y += 0.01;
+        }
+        popcornRenderer.render(popcornScene, popcornCamera);
+    }
+    animatePopcorn();
+
+    // Handle resize
+    window.addEventListener('resize', () => {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        popcornRenderer.setSize(w, h);
+        popcornCamera.aspect = w / h;
+        popcornCamera.updateProjectionMatrix();
+    });
+
+    // Intersection Observer for reveal animation
+    const popcornSection = document.querySelector('.popcorn-text');
+    const popcornContainer = document.querySelector('#popcorn-container');
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    popcornContainer.classList.add('visible');
+                } else {
+                    popcornContainer.classList.remove('visible');
+                }
+            });
+        },
+        { threshold: 0.15 }
+    );
+    observer.observe(popcornSection);
+})();
 
 
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+const renderer = new THREE.WebGLRenderer({
+    canvas: document.querySelector('#bg'),
+});
 renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setAnimationLoop(animate);
 
