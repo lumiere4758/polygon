@@ -24,9 +24,9 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
     let cupcakeModel = null;
     const loader = new GLTFLoader();
-    loader.load('/public/cupcake.glb', (gltf) => {
+    loader.load('/cupcake.glb', (gltf) => {
         cupcakeModel = gltf.scene;
-
+        
         // Center and scale model
         const box = new THREE.Box3().setFromObject(cupcakeModel);
         const center = box.getCenter(new THREE.Vector3());
@@ -98,7 +98,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
     let popcornModel = null;
     const loader = new GLTFLoader();
-    loader.load('/public/popcorn.glb', (gltf) => {
+    loader.load('/popcorn.glb', (gltf) => {
         popcornModel = gltf.scene;
 
         // Center and scale model
@@ -164,7 +164,7 @@ renderer.setAnimationLoop(animate);
 renderer.render(scene, camera);
 document.body.appendChild( renderer.domElement );
 const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-const texture = new THREE.TextureLoader().load('public/missy.jpg');
+const texture = new THREE.TextureLoader().load('/missy.jpg');
 const material = new THREE.MeshBasicMaterial( { map: texture } );
 const cube = new THREE.Mesh( geometry, material );
 scene.add( cube );
